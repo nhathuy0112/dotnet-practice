@@ -1,0 +1,92 @@
+[
+  {
+    "Name": "Speedster Board 2000",
+    "Price": 200,
+    "CategoryId": 1
+  },
+  {
+    "Name": "Green Board 3000",
+    "Price": 150,
+    "CategoryId": 1
+  },
+  {
+    "Name": "Board Speed Rush 3",
+    "Price": 180,
+    "CategoryId": 1
+  },
+  {
+    "Name": "Super Board",
+    "Price": 300,
+    "CategoryId": 1
+  },
+  {
+    "Name": "Board Super Whizzy Fast",
+    "Price": 250,
+    "CategoryId": 1
+  },
+  {
+    "Name": "Entry Board",
+    "Price": 120,
+    "CategoryId": 1
+  },
+  {
+    "Name": "Blue Hat",
+    "Price": 10,
+    "CategoryId": 2
+  },
+  {
+    "Name": "Green Woolen Hat",
+    "Price": 8,
+    "CategoryId": 2
+  },
+  {
+    "Name": "Purple Woolen Hat",
+    "Price": 15,
+    "CategoryId": 2
+  },
+  {
+    "Name": "Blue Gloves",
+    "Price": 18,
+    "CategoryId": 4
+  },
+  {
+    "Name": "Green Gloves",
+    "Price": 15,
+    "CategoryId": 4
+  },
+  {
+    "Name": "Purple Gloves",
+    "Price": 16,
+    "CategoryId": 4
+  },
+  {
+    "Name": "Green Gloves",
+    "Price": 14,
+    "CategoryId": 4
+  },
+  {
+    "Name": "Red Boots",
+    "Price": 250,
+    "CategoryId": 3
+  },
+  {
+    "Name": "Red Boots",
+    "Price": 189,
+    "CategoryId": 3
+  },
+  {
+    "Name": "Purple Boots",
+    "Price": 199,
+    "CategoryId": 3
+  },
+  {
+    "Name": "Purple Boots",
+    "Price": 150,
+    "CategoryId": 3
+  },
+  {
+    "Name": "Blue Boots",
+    "Price": 180,
+    "CategoryId": 3
+  }
+]

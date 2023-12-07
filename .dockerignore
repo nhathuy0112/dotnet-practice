@@ -1,0 +1,11 @@
+**/bin
+**/obj
+**/out
+**/.vscode
+**/.vs
+.dotnet
+.Microsoft.DotNet.ImageBuilder
+tests/UnitTest/TestResults
+tests/UnitTest/TestReport
+.DS_Store
+.idea

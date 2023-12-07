@@ -1,0 +1,15 @@
+services:
+  store-server:
+    image: mcr.microsoft.com/mssql/server:latest
+    pull_policy: missing
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Qwe12345@
+  store-app:
+    build: .
+    ports:
+      - 8081:80
+    depends_on:
+      - store-server

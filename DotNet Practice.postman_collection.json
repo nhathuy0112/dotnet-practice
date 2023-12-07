@@ -1,0 +1,1055 @@
+{
+	"info": {
+		"_postman_id": "2141bb54-bb5e-4d81-8240-bccb2cd6e9f2",
+		"name": "DotNet Practice",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "17578027"
+	},
+	"item": [
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "Get all categories",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Category/categories",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Category",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update category",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"name\": \"Laptop\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Category/category/1",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Category",
+								"category",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update category (invalid)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"name\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Category/category/1",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Category",
+								"category",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update category (not found)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Laptop\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Category/category/0",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Category",
+								"category",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add category",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Apple\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Category/category",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Category",
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add category invalid",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Category/category",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Category",
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete category",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Category/category/5",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Category",
+								"category",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete category (not found)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Category/category/0",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Category",
+								"category",
+								"0"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Login as admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json()",
+									"pm.environment.set(\"token\", response.accessToken)",
+									"pm.environment.set(\"refresh_token\", response.refreshToken)",
+									"",
+									"function setTokenExp(token) {",
+									"  const base64Url = token.split(\".\")[1];",
+									"  const base64 = base64Url.replace(/-/g, \"+\").replace(/_/g, \"/\");",
+									"  const jsonPayload = decodeURIComponent(",
+									"    atob(base64)",
+									"      .split(\"\")",
+									"      .map(function (c) {",
+									"        return \"%\" + (\"00\" + c.charCodeAt(0).toString(16)).slice(-2);",
+									"      })",
+									"      .join(\"\")",
+									"  );",
+									"",
+									"  const { exp } = JSON.parse(jsonPayload);",
+									"  pm.environment.set(\"token_exp\", exp * 1000)",
+									"}",
+									"",
+									"setTokenExp(response.accessToken)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\" : \"admin@store.com\",\n    \"password\" : \"Abc12345!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/login",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"huy@cde.com\",\n    \"password\": \"Abc12345!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/register",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login (for refresh testing)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"default1@abc.com\",\n    \"password\": \"Abc12345!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/login",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register (invalid email)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"account\",\n    \"password\": \"Abc12345!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/register",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register (invalid password)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"store@qwe.com\",\n    \"password\": \"1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/register",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register (email existed)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"default1@abc.com\",\n    \"password\": \"Abc12345!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/register",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login (wrong email or password)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"default1@abc.commmmmm\",\n    \"password\": \"Abc12345!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/login",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout current admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\"{{refresh_token}}\"",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/logout",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"default2@abc.com\",\n    \"password\": \"Abc12345!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/login",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accessoToken\": \"\",\n    \"refreshToken\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/User/refresh",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"User",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "Get products",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Product/products?Sort=date-desc",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"products"
+							],
+							"query": [
+								{
+									"key": "PriceMin",
+									"value": "100",
+									"disabled": true
+								},
+								{
+									"key": "PriceMax",
+									"value": "100",
+									"disabled": true
+								},
+								{
+									"key": "Name",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "CategoryId",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "PageIndex",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "PageSize",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "Sort",
+									"value": "date-desc",
+									"description": "value: name, name-desc, price, price-desc, date, date-desc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Iphone\",\n    \"price\": 2,\n    \"categoryId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Product/product",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add product (Invalid category)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ipad\",\n    \"price\": 200,\n    \"categoryId\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Product/product",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add product (Invalid)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"\",\n    \"price\": 0,\n    \"categoryId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Product/product",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 2,\n    \"name\": \"Motor\",\n    \"price\": 200,\n    \"categoryId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Product/product/2",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"product",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update product (Invalid category)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": 1,\n    \"name\": \"Motor\",\n    \"price\": 200,\n    \"categoryId\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Product/product/1",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"product",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Product/product/4",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"product",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete product (Not found)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Product/product/0",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"product",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get product by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Product/product/1",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"product",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get product by id (Not found)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Product/product/0",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Product",
+								"product",
+								"0"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Get users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Admin/users",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Admin",
+								"users"
+							],
+							"query": [
+								{
+									"key": "PageIndex",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "PageSize",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "Sort",
+									"value": "email-desc",
+									"description": "value: email, email-desc",
+									"disabled": true
+								},
+								{
+									"key": "Email",
+									"value": "default",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update normal user to admin",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Admin/role/839cfe9c-6d98-4947-955e-426a3d32ecf4",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Admin",
+								"role",
+								"839cfe9c-6d98-4947-955e-426a3d32ecf4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update normal user to admin (already admin)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Admin/role/839cfe9c-6d98-4947-955e-426a3d32ecf4",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Admin",
+								"role",
+								"839cfe9c-6d98-4947-955e-426a3d32ecf4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update normal user to admin (Not found)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Admin/role/absdad",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Admin",
+								"role",
+								"absdad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"ecc3002d-23ec-4584-93e8-92948ca59bba\",\n    \"email\": \"huy@cde.com\",\n    \"password\": \"Abcd321!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{uri}}/Admin/user/ecc3002d-23ec-4584-93e8-92948ca59bba",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Admin",
+								"user",
+								"ecc3002d-23ec-4584-93e8-92948ca59bba"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{uri}}/Admin/user/7eab86bf-211c-43ae-8c9b-6e0eef1918bc",
+							"host": [
+								"{{uri}}"
+							],
+							"path": [
+								"Admin",
+								"user",
+								"7eab86bf-211c-43ae-8c9b-6e0eef1918bc"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"let tokenExpiry = pm.environment.get('token_exp')",
+					"",
+					"if (tokenExpiry) {",
+					"    let isTokenExpired = Date.now() >= tokenExpiry",
+					"    let url = pm.environment.get('uri')",
+					"    let refreshUrl = url + '/User/refresh'",
+					"    function setTokenExp(token) {",
+					"    const base64Url = token.split(\".\")[1];",
+					"    const base64 = base64Url.replace(/-/g, \"+\").replace(/_/g, \"/\");",
+					"    const jsonPayload = decodeURIComponent(",
+					"      atob(base64)",
+					"        .split(\"\")",
+					"        .map(function (c) {",
+					"          return \"%\" + (\"00\" + c.charCodeAt(0).toString(16)).slice(-2);",
+					"        })",
+					"        .join(\"\")",
+					"    );",
+					"",
+					"    const { exp } = JSON.parse(jsonPayload);",
+					"    pm.environment.set(\"token_exp\", exp * 1000)",
+					"    }",
+					"    if (isTokenExpired) {",
+					"        pm.sendRequest({",
+					"            url: refreshUrl,",
+					"            header: {",
+					"                'Content-Type': 'application/json'",
+					"            },",
+					"            method: 'POST',",
+					"            body: {",
+					"                mode: 'raw',",
+					"                raw: JSON.stringify({",
+					"                    'accessToken': pm.environment.get('token'),",
+					"                    'refreshToken': pm.environment.get('refresh_token')",
+					"                })",
+					"            }",
+					"        }, function (err, response) {",
+					"            let jsonData = response.json()",
+					"            pm.environment.set('token', jsonData.accessToken)",
+					"            pm.environment.set('refresh_token', jsonData.refreshToken)",
+					"            setTokenExp(jsonData.accessToken)",
+					"        });",
+					"    }",
+					"}",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
