@@ -1,5 +1,5 @@
 using System.Collections;
-using Application.Common.Interfaces;
+using Application.Interfaces;
 using Domain.Common;
 using Infrastructure.Data;
 
@@ -9,52 +9,26 @@ public class UnitOfWork : IUnitOfWork, IDisposable
 {
     private bool isDisposed;
     private readonly AppDbContext _context;
-    private CategoryRepository _categoryRepository;
-    private ProductRepository _productRepository;
-    private TokenRepository _tokenRepository;
+    private readonly Hashtable _repositories;
     
     public UnitOfWork(AppDbContext dbContext)
     {
         _context = dbContext;
+        _repositories = new Hashtable();
     }
 
-    public ICategoryRepository CategoryRepository
+    public IRepository<T> Repository<T>() where T : BaseEntity
     {
-        get
+        var type = typeof(T).Name;
+
+        if (!_repositories.ContainsKey(type))
         {
-            if (_categoryRepository == null)
-            {
-                _categoryRepository = new(_context);
-            }
-
-            return _categoryRepository;
+            var repoType = typeof(RepositoryBase<>);
+            var repoInstance = Activator.CreateInstance(repoType.MakeGenericType(typeof(T)), _context);
+            _repositories.Add(type, repoInstance);
         }
-    }
 
-    public IProductRepository ProductRepository
-    {
-        get
-        {
-            if (_productRepository == null)
-            {
-                _productRepository = new(_context);
-            }
-
-            return _productRepository;
-        }
-    }
-
-    public ITokenRepository TokenRepository
-    {
-        get
-        {
-            if (_tokenRepository == null)
-            {
-                _tokenRepository = new(_context);
-            }
-
-            return _tokenRepository;
-        }
+        return (IRepository<T>)_repositories[type];
     }
 
     public async Task<int> CompleteAsync()

@@ -1,8 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Application.Users.Commands.Login;
-using Application.Users.Commands.Register;
+using Application.Dto.Auth;
 using IntegrationTest.Setup;
 
 namespace IntegrationTest;
@@ -22,7 +21,7 @@ public class UserControllerTest : IClassFixture<TestWebApplicationFactory<Progra
     [Fact]
     public async Task Test_Register_Success()
     {
-        var newUser = new RegisterCommand()
+        var newUser = new RegisterRequest()
         {
             Email = "testuser@abc.com",
             Password = "Abc12345!"
@@ -36,7 +35,7 @@ public class UserControllerTest : IClassFixture<TestWebApplicationFactory<Progra
     [Fact]
     public async Task Test_Register_Email_Existed()
     {
-        var newUser = new RegisterCommand()
+        var newUser = new RegisterRequest()
         {
             Email = "admin@store.com",
             Password = "Abc12345!"
@@ -50,7 +49,7 @@ public class UserControllerTest : IClassFixture<TestWebApplicationFactory<Progra
     [Fact]
     public async Task Test_Register_Invalid_Email_Or_Password()
     {
-        var newUser = new RegisterCommand()
+        var newUser = new RegisterRequest()
         {
             Email = "abc",
             Password = "1"
@@ -64,7 +63,7 @@ public class UserControllerTest : IClassFixture<TestWebApplicationFactory<Progra
     [Fact]
     public async Task Test_Login_Success()
     {
-        var user = new LoginCommand()
+        var user = new LoginRequest()
         {
             Email = "admin@store.com",
             Password = "Abc12345!"
@@ -82,7 +81,7 @@ public class UserControllerTest : IClassFixture<TestWebApplicationFactory<Progra
     [Fact]
     public async Task Test_Login_Wrong_Email_Or_Password()
     {
-        var user = new LoginCommand()
+        var user = new LoginRequest()
         {
             Email = "admin@store.commmmmm",
             Password = "Abc12345!"
@@ -96,7 +95,7 @@ public class UserControllerTest : IClassFixture<TestWebApplicationFactory<Progra
     [Fact]
     public async Task Test_Logout_Success()
     {
-        var user = new LoginCommand()
+        var user = new LoginRequest()
         {
             Email = "admin@store.com",
             Password = "Abc12345!"
@@ -116,7 +115,7 @@ public class UserControllerTest : IClassFixture<TestWebApplicationFactory<Progra
     [Fact]
     public async Task Test_Logout_Invalid_Token()
     {
-        var user = new LoginCommand()
+        var user = new LoginRequest()
         {
             Email = "admin@store.com",
             Password = "Abc12345!"

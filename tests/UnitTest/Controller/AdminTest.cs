@@ -1,10 +1,8 @@
 using API.Controllers;
-using Application.Users.Commands.DeleteUser;
-using Application.Users.Commands.UpdateUser;
-using Application.Users.Commands.UpdateUserToAdmin;
-using Application.Users.Queries.GetUsers;
-using Domain.QueryParams.User;
-using MediatR;
+using Application.Dto.User;
+using Application.Helpers;
+using Application.Interfaces;
+using Domain.Specification.User;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -12,49 +10,42 @@ namespace UnitTest.Controller;
 
 public class AdminTest
 {
-    private readonly Mock<IMediator> _mockMediator = new();
+    private readonly Mock<IUserService> _mockUserService;
 
+    public AdminTest()
+    {
+        _mockUserService = new();
+        SetupMockUserService();
+    }
+    
     [Fact]
     public async Task Test_GetUsers()
     {
         // ARRANGE
         var once = Times.Once();
-        var controller = new AdminController(_mockMediator.Object);
+        var controller = new AdminController(_mockUserService.Object);
         
         // ACT
-        var data = await controller.GetUsers(new UserQueryParams());
+        var data = await controller.GetUsers(new UserRequestParams());
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<GetUserQuery>(), It.IsAny<CancellationToken>()), once);
+        _mockUserService.Verify(s => s.GetUsersAsync(It.IsAny<UserRequestParams>()), once);
         Assert.IsType<OkObjectResult>(data);
     }
 
     [Fact]
-    public async Task Test_UpdateUser_Success()
+    public async Task Test_UpdateUser()
     {
         // ARRANGE
         var once = Times.Once();
-        var controller = new AdminController(_mockMediator.Object);
+        var controller = new AdminController(_mockUserService.Object);
         
         // ACT
-        var data = await controller.UpdateUser("", new UpdateUserCommand() {Id = ""});
+        var data = await controller.UpdateUser("",new UserRequest());
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateUserCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockUserService.Verify(s => s.UpdateUserAsync(It.IsAny<string>(), It.IsAny<UserRequest>()), once);
         Assert.IsType<OkObjectResult>(data);
-    }
-    
-    [Fact]
-    public async Task Test_UpdateUser_BadRequest()
-    {
-        // ARRANGE
-        var controller = new AdminController(_mockMediator.Object);
-        
-        // ACT
-        var data = await controller.UpdateUser("1", new UpdateUserCommand() {Id = "2"});
-        
-        // ASSERT
-        Assert.IsType<BadRequestResult>(data);
     }
     
     [Fact]
@@ -62,13 +53,13 @@ public class AdminTest
     {
         // ARRANGE
         var once = Times.Once();
-        var controller = new AdminController(_mockMediator.Object);
+        var controller = new AdminController(_mockUserService.Object);
         
         // ACT
         var data = await controller.UpdateRoleAdmin("");
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateUserToAdminCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockUserService.Verify(s => s.UpdateUserToRoleAdminAsync(It.IsAny<string>()), once);
         Assert.IsType<OkObjectResult>(data);
     }
     
@@ -77,14 +68,32 @@ public class AdminTest
     {
         // ARRANGE
         var once = Times.Once();
-        var controller = new AdminController(_mockMediator.Object);
+        var controller = new AdminController(_mockUserService.Object);
         
         // ACT
         var data = await controller.DeleteUser("");
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<DeleteUserCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockUserService.Verify(s => s.DeleteUserAsync(It.IsAny<string>()), once);
         Assert.IsType<OkObjectResult>(data);
     }
 
+    private void SetupMockUserService()
+    {
+        _mockUserService
+            .Setup(s => s.GetUsersAsync(It.IsAny<UserRequestParams>()))
+            .ReturnsAsync(new PaginatedResponse<UserResponse>());
+
+        _mockUserService
+            .Setup(s => s.UpdateUserAsync(It.IsAny<string>(), It.IsAny<UserRequest>()))
+            .ReturnsAsync(new UserResponse());
+
+        _mockUserService
+            .Setup(s => s.UpdateUserToRoleAdminAsync(It.IsAny<string>()))
+            .ReturnsAsync(true);
+
+        _mockUserService
+            .Setup(s => s.DeleteUserAsync(It.IsAny<string>()))
+            .ReturnsAsync(true);
+    }
 }

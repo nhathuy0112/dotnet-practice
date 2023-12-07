@@ -1,5 +1,5 @@
 using Domain.Entities;
-using Domain.QueryParams.User;
+using Domain.Specification.User;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Moq;
+using UnitTest.Repository.Specification;
 
 namespace UnitTest.Repository;
 
@@ -230,22 +231,70 @@ public class UserRepositoryTest
     }
 
     [Fact]
+    public async Task Test_GetUsersAsync_All_User()
+    {
+        // ARRANGE
+        var userRepo = new UserRepository(_mockContext.Object, _mockUserManager.Object, _mockRoleManager.Object);
+
+        var allUserSpec = new TestUserSpecification.TestAllUserSpec();
+        
+        // ACT
+        var data = await userRepo.GetUsersAsync(allUserSpec);
+        
+        // ASSERT
+        Assert.Equal(3, data.Count);
+    }
+
+    [Fact]
     public async Task Test_GetUsersAsync_With_Filter()
     {
         // ARRANGE
         var userRepo = new UserRepository(_mockContext.Object, _mockUserManager.Object, _mockRoleManager.Object);
 
-        var queryPamrams = new UserQueryParams()
-        {
-            Email = "user",
-            Sort = "email"
-        };
+        var usersByEmailSpec = new TestUserSpecification.TestUserSpecWithFilter(email: "user");
         
         // ACT
-        var data = await userRepo.GetUsersAsync(queryPamrams, "1");
+        var data = await userRepo.GetUsersAsync(usersByEmailSpec);
         
         // ASSERT
         Assert.Equal(2, data.Count);
+    }
+
+    [Fact]
+    public async Task Test_GetUsersAsync_OrderBy_Username()
+    {
+        // ARRANGE
+        var userRepo = new UserRepository(_mockContext.Object, _mockUserManager.Object, _mockRoleManager.Object);
+
+        var userOrderByUsernameSpec = new TestUserSpecification.TestUserSpecOrderBy();
+        
+        // ACT
+        var data = await userRepo.GetUsersAsync(userOrderByUsernameSpec);
+        
+        //ASSERT
+        Assert.Equal(3, data.Count);
+        Assert.Equal("Admin", data[0].UserName);
+    }
+
+    [Fact]
+    public async Task Test_GetUsersAsync_Use_RequestParam()
+    {
+        // ARRANGE
+        var userRepo = new UserRepository(_mockContext.Object, _mockUserManager.Object, _mockRoleManager.Object);
+
+        var userRequestParam = new UserRequestParams()
+        {
+            Sort = "email"
+        };
+
+        var userSpec = new UserByRoleSpecification("1", userRequestParam);
+            
+        // ACT
+        var data = await userRepo.GetUsersAsync(userSpec);
+        
+        // ASSERT
+       Assert.Equal(2, data.Count); 
+       Assert.Equal("2", data[0].Id);
     }
 
     [Fact]
@@ -269,8 +318,10 @@ public class UserRepositoryTest
         // ARRANGE
         var userRepo = new UserRepository(_mockContext.Object, _mockUserManager.Object, _mockRoleManager.Object);
 
+        var userSpec = new UserByRoleForCountSpecification("1", new UserRequestParams());
+        
         // ACT
-        var data = await userRepo.CountUsersAsync(new UserQueryParams(), "1");
+        var data = await userRepo.CountUsersAsync(userSpec);
         
         // ASSER
         Assert.Equal(2, data);

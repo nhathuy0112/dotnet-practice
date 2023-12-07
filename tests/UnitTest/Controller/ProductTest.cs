@@ -1,21 +1,25 @@
 using System.Security.Claims;
 using API.Controllers;
-using Application.Products.Commands.AddProduct;
-using Application.Products.Commands.DeleteProduct;
-using Application.Products.Commands.UpdateProduct;
-using Application.Products.Queries.GetProductById;
-using Application.Products.Queries.GetProducts;
-using Domain.QueryParams.Product;
-using MediatR;
+using Application.Dto.Product;
+using Application.Helpers;
+using Application.Interfaces;
+using Domain.Specification.Product;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Range = Moq.Range;
 
 namespace UnitTest.Controller;
 
 public class ProductTest
 {
-    private readonly Mock<IMediator> _mockMediator = new();
+    private readonly Mock<IProductService> _mockProductService;
+
+    public ProductTest()
+    {
+        _mockProductService = new();
+        SetupMockProductService();
+    }
 
     [Fact]
     public async Task Test_GetProducts()
@@ -23,13 +27,13 @@ public class ProductTest
         // ARRANGE
         var once = Times.Once();
 
-        var controller = new ProductController(_mockMediator.Object);
+        var controller = new ProductController(_mockProductService.Object);
         
         // ACT
-        var data = await controller.GetProducts(new ProductQueryParams());
+        var data = await controller.GetProducts(new ProductRequestParams());
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<GetProductsQuery>(), It.IsAny<CancellationToken>()), once);
+        _mockProductService.Verify(s => s.GetProductsAsync(It.IsAny<ProductRequestParams>()), once);
         Assert.IsType<OkObjectResult>(data);
     }
 
@@ -39,13 +43,13 @@ public class ProductTest
         // ARRANGE
         var once = Times.Once();
 
-        var controller = new ProductController(_mockMediator.Object);
+        var controller = new ProductController(_mockProductService.Object);
         
         // ACT
         var data = await controller.GetProductById(1);
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<GetProductByIdQuery>(), It.IsAny<CancellationToken>()), once);
+        _mockProductService.Verify(s => s.GetProductByIdAsync(It.IsInRange(1,Int32.MaxValue, Range.Inclusive)), once);
         Assert.IsType<OkObjectResult>(data);
     }
 
@@ -55,7 +59,7 @@ public class ProductTest
         // ARRANGE
         var once = Times.Once();
         
-        var controller = new ProductController(_mockMediator.Object)
+        var controller = new ProductController(_mockProductService.Object)
         {
             ControllerContext = new ControllerContext()
             {
@@ -64,42 +68,27 @@ public class ProductTest
         };
 
         // ACT
-        var data = await controller.AddProduct(new AddProductCommand());
+        var data = await controller.AddProduct(new ProductRequest());
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<AddProductCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockProductService.Verify(s => s.AddProductAsync(It.IsAny<ProductRequest>(), It.IsAny<string>()), once);
         Assert.IsType<OkObjectResult>(data);
     }
     
     [Fact]
-    public async Task Test_UpdateProduct_Success()
+    public async Task Test_UpdateProduct()
     {
         // ARRANGE
         var once = Times.Once();
         
-        var controller = new ProductController(_mockMediator.Object);
+        var controller = new ProductController(_mockProductService.Object);
 
         // ACT
-        var data = await controller.UpdateProduct(1, new UpdateProductCommand() {Id = 1});
+        var data = await controller.UpdateProduct(1, new ProductRequest());
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<UpdateProductCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockProductService.Verify(s => s.UpdateProductAsync(It.IsInRange(1,Int32.MaxValue, Range.Inclusive),It.IsAny<ProductRequest>()), once);
         Assert.IsType<OkObjectResult>(data);
-    }
-    
-    [Fact]
-    public async Task Test_UpdateProduct_BadRequest()
-    {
-        // ARRANGE
-        var once = Times.Once();
-        
-        var controller = new ProductController(_mockMediator.Object);
-
-        // ACT
-        var data = await controller.UpdateProduct(1, new UpdateProductCommand() {Id = 2});
-        
-        // ASSERT
-        Assert.IsType<BadRequestResult>(data);
     }
     
     [Fact]
@@ -108,13 +97,33 @@ public class ProductTest
         // ARRANGE
         var once = Times.Once();
         
-        var controller = new ProductController(_mockMediator.Object);
+        var controller = new ProductController(_mockProductService.Object);
 
         // ACT
         var data = await controller.DeleteProduct(1);
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<DeleteProductCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockProductService.Verify(s => s.DeleteProductAsync(It.IsInRange(1,Int32.MaxValue, Range.Inclusive)), once);
         Assert.IsType<OkObjectResult>(data);
+    }
+
+    private void SetupMockProductService()
+    {
+        _mockProductService
+            .Setup(s => s.GetProductsAsync(It.IsAny<ProductRequestParams>()))
+            .ReturnsAsync(new PaginatedResponse<ProductResponse>());
+
+        _mockProductService
+            .Setup(s => s.AddProductAsync(It.IsAny<ProductRequest>(), It.IsAny<string>()))
+            .ReturnsAsync(new ProductResponse());
+        
+        _mockProductService
+            .Setup(s => s.UpdateProductAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive),
+                It.IsAny<ProductRequest>()))
+            .ReturnsAsync(new ProductResponse());
+
+        _mockProductService
+            .Setup(s => s.DeleteProductAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
+            .ReturnsAsync(true);
     }
 }

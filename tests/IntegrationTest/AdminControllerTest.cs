@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Application.Common.Helpers;
-using Application.Users.Queries.GetUsers;
+using Application.Dto.User;
+using Application.Helpers;
 using IntegrationTest.Setup;
 using Microsoft.AspNetCore.WebUtilities;
 
@@ -28,8 +28,8 @@ public class AdminControllerTest : IClassFixture<TestWebApplicationFactory<Progr
     {
         var response = await _client.GetAsync($"{BaseUri}/users");
 
-        var users = await response.Content.ReadFromJsonAsync<PaginatedResponse<GetUsersResponse>>() ??
-                    new PaginatedResponse<GetUsersResponse>();
+        var users = await response.Content.ReadFromJsonAsync<PaginatedResponse<UserResponse>>() ??
+                    new PaginatedResponse<UserResponse>();
         
         Assert.NotEqual(0, users.Count);
     }
@@ -46,8 +46,8 @@ public class AdminControllerTest : IClassFixture<TestWebApplicationFactory<Progr
         
         var response = await _client.GetAsync(uri);
 
-        var users = await response.Content.ReadFromJsonAsync<PaginatedResponse<GetUsersResponse>>() ??
-                    new PaginatedResponse<GetUsersResponse>();
+        var users = await response.Content.ReadFromJsonAsync<PaginatedResponse<UserResponse>>() ??
+                    new PaginatedResponse<UserResponse>();
         
         Assert.NotEqual(0, users.Count);
     }
@@ -65,8 +65,8 @@ public class AdminControllerTest : IClassFixture<TestWebApplicationFactory<Progr
         
         var response = await _client.GetAsync(uri);
 
-        var users = await response.Content.ReadFromJsonAsync<PaginatedResponse<GetUsersResponse>>() ??
-                    new PaginatedResponse<GetUsersResponse>();
+        var users = await response.Content.ReadFromJsonAsync<PaginatedResponse<UserResponse>>() ??
+                    new PaginatedResponse<UserResponse>();
         
         Assert.True(users.Data.Count <= 2);
     }
@@ -76,8 +76,8 @@ public class AdminControllerTest : IClassFixture<TestWebApplicationFactory<Progr
     {
         var getUsersResponse = await _client.GetAsync($"{BaseUri}/users");
 
-        var users = await getUsersResponse.Content.ReadFromJsonAsync<PaginatedResponse<GetUsersResponse>>() ??
-                    new PaginatedResponse<GetUsersResponse>();
+        var users = await getUsersResponse.Content.ReadFromJsonAsync<PaginatedResponse<UserResponse>>() ??
+                    new PaginatedResponse<UserResponse>();
 
         var userToUpdate = users.Data[0];
 
@@ -99,8 +99,8 @@ public class AdminControllerTest : IClassFixture<TestWebApplicationFactory<Progr
     {
         var getUsersResponse = await _client.GetAsync($"{BaseUri}/users");
 
-        var users = await getUsersResponse.Content.ReadFromJsonAsync<PaginatedResponse<GetUsersResponse>>() ??
-                    new PaginatedResponse<GetUsersResponse>();
+        var users = await getUsersResponse.Content.ReadFromJsonAsync<PaginatedResponse<UserResponse>>() ??
+                    new PaginatedResponse<UserResponse>();
 
         var userToDelete = users.Data[0];
         

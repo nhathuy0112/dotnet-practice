@@ -1,5 +1,6 @@
 using API.Extensions;
 using API.Middleware;
+using Application.Helpers;
 using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -14,11 +15,10 @@ builder.Services.AddSqlServer(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSwaggerDocumentation();
-builder.Services.AddAutoMapperConfig();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddIdentity(builder.Configuration);
 builder.Services.AddFluentValidation();
 builder.Services.AddDependency();
-builder.Services.AddMediatorConfig();
 builder.Services.AddApiBehaviorConfig();
 
 var app = builder.Build();

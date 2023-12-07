@@ -1,4 +1,4 @@
-using Application.Common.Errors;
+using Application.Errors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Extensions;

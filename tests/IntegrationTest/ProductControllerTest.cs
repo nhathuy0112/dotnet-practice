@@ -1,11 +1,8 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Application.Common.Helpers;
-using Application.Products.Commands.AddProduct;
-using Application.Products.Commands.UpdateProduct;
-using Application.Products.Queries.GetProductById;
-using Application.Products.Queries.GetProducts;
+using Application.Dto.Product;
+using Application.Helpers;
 using IntegrationTest.Setup;
 using Microsoft.AspNetCore.WebUtilities;
 
@@ -30,8 +27,8 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
     {
         var response = await _client.GetAsync($"{BaseUri}/products");
 
-        var products = await response.Content.ReadFromJsonAsync<PaginatedResponse<GetProductsResponse>>() ??
-                         new PaginatedResponse<GetProductsResponse>();
+        var products = await response.Content.ReadFromJsonAsync<PaginatedResponse<ProductResponse>>() ??
+                         new PaginatedResponse<ProductResponse>();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.NotEqual(0, products.Count);
@@ -49,8 +46,8 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
         
         var response = await _client.GetAsync(uri);
         
-        var products = await response.Content.ReadFromJsonAsync<PaginatedResponse<GetProductsResponse>>() ??
-                       new PaginatedResponse<GetProductsResponse>();
+        var products = await response.Content.ReadFromJsonAsync<PaginatedResponse<ProductResponse>>() ??
+                       new PaginatedResponse<ProductResponse>();
         
         Assert.True(products.Data.All(p => p.CategoryId == 2));
         Assert.True(products.Data[0].Price >= products.Data[1].Price);
@@ -68,8 +65,8 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
         
         var response = await _client.GetAsync(uri);
         
-        var products = await response.Content.ReadFromJsonAsync<PaginatedResponse<GetProductsResponse>>() ??
-                       new PaginatedResponse<GetProductsResponse>();
+        var products = await response.Content.ReadFromJsonAsync<PaginatedResponse<ProductResponse>>() ??
+                       new PaginatedResponse<ProductResponse>();
         
         Assert.DoesNotContain(products.Data, p => p.Price is < 200 or > 250);
     }
@@ -86,8 +83,8 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
         
         var response = await _client.GetAsync(uri);
         
-        var productsFirstPage = await response.Content.ReadFromJsonAsync<PaginatedResponse<GetProductsResponse>>() ??
-                       new PaginatedResponse<GetProductsResponse>();
+        var productsFirstPage = await response.Content.ReadFromJsonAsync<PaginatedResponse<ProductResponse>>() ??
+                       new PaginatedResponse<ProductResponse>();
 
         Assert.True(productsFirstPage.Data.Count <= 3);
     }
@@ -105,8 +102,8 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
         
         var response = await _client.GetAsync(uri);
         
-        var products = await response.Content.ReadFromJsonAsync<PaginatedResponse<GetProductsResponse>>() ??
-                                new PaginatedResponse<GetProductsResponse>();
+        var products = await response.Content.ReadFromJsonAsync<PaginatedResponse<ProductResponse>>() ??
+                                new PaginatedResponse<ProductResponse>();
         
         Assert.Equal(1, products.PageIndex);
         Assert.Equal(50, products.PageSize);
@@ -118,13 +115,13 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
     {
         var getAllResponse = await _client.GetAsync($"{BaseUri}/products");
 
-        var products = await getAllResponse.Content.ReadFromJsonAsync<PaginatedResponse<GetProductsResponse>>() ??
-                       new PaginatedResponse<GetProductsResponse>();
+        var products = await getAllResponse.Content.ReadFromJsonAsync<PaginatedResponse<ProductResponse>>() ??
+                       new PaginatedResponse<ProductResponse>();
 
         var productToGet = products.Data[0];
         var response = await _client.GetAsync($"{BaseUri}/product/{productToGet.Id}");
 
-        var product = await response.Content.ReadFromJsonAsync<GetProductByIdResponse>() ?? new GetProductByIdResponse();
+        var product = await response.Content.ReadFromJsonAsync<ProductResponse>() ?? new ProductResponse();
         
         Assert.Equal(productToGet.Id, product.Id);
     }
@@ -144,17 +141,16 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
     {
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
-        var newProduct = new AddProductCommand()
+        var newProduct = new ProductRequest()
         {
             CategoryId = 2,
             Name = "Phone",
-            Price = 200,
-            CreatedBy = "admin@store.com"
+            Price = 200
         };
 
         var response = await _client.PostAsJsonAsync($"{BaseUri}/product", newProduct);
 
-        var product = await response.Content.ReadFromJsonAsync<AddProductResponse>() ?? new AddProductResponse();
+        var product = await response.Content.ReadFromJsonAsync<ProductResponse>() ?? new ProductResponse();
         
         Assert.NotEqual(0, product.Id);
         Assert.Equal(newProduct.Name, product.Name);
@@ -167,12 +163,11 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
     {
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
-        var newProduct = new AddProductCommand()
+        var newProduct = new ProductRequest()
         {
             CategoryId = 100,
             Name = "Phone",
-            Price = 200,
-            CreatedBy = "admin@store.com"
+            Price = 200
         };
 
         var response = await _client.PostAsJsonAsync($"{BaseUri}/product", newProduct);
@@ -185,12 +180,11 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
     {
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
-        var newProduct = new AddProductCommand()
+        var newProduct = new ProductRequest()
         {
             CategoryId = 2,
             Name = "",
-            Price = -1,
-            CreatedBy = "admin@store.com"
+            Price = -1
         };
 
         var response = await _client.PostAsJsonAsync($"{BaseUri}/product", newProduct);
@@ -205,15 +199,14 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
             new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
         var getAllResponse = await _client.GetAsync($"{BaseUri}/products");
 
-        var products = await getAllResponse.Content.ReadFromJsonAsync<PaginatedResponse<GetProductsResponse>>() ??
-                       new PaginatedResponse<GetProductsResponse>();
+        var products = await getAllResponse.Content.ReadFromJsonAsync<PaginatedResponse<ProductResponse>>() ??
+                       new PaginatedResponse<ProductResponse>();
 
         var productToUpdate = products.Data[0];
 
         string nameToUpdate = "Macbook";
-        var updateRequest = new UpdateProductCommand()
+        var updateRequest = new ProductRequest()
         {
-            Id = productToUpdate.Id,
             CategoryId = productToUpdate.CategoryId,
             Name = nameToUpdate,
             Price = productToUpdate.Price
@@ -221,7 +214,7 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
 
         var response = await _client.PutAsJsonAsync($"{BaseUri}/product/{productToUpdate.Id}", updateRequest);
 
-        var product = await response.Content.ReadFromJsonAsync<UpdateProductResponse>() ?? new UpdateProductResponse();
+        var product = await response.Content.ReadFromJsonAsync<ProductResponse>() ?? new ProductResponse();
         
         Assert.Equal(productToUpdate.Id, product.Id);
         Assert.Equal(nameToUpdate, product.Name);
@@ -233,9 +226,8 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
         int productId = 10;
-        var updatedProduct = new UpdateProductCommand()
+        var updatedProduct = new ProductRequest()
         {
-            Id = productId,
             CategoryId = 100,
             Name = "Phone",
             Price = 200
@@ -251,10 +243,9 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
     {
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
-        int productId = 100;
-        var updatedProduct = new UpdateProductCommand()
+        int productId = 0;
+        var updatedProduct = new ProductRequest()
         {
-            Id = productId,
             CategoryId = 100,
             Name = "Phone",
             Price = 200
@@ -271,9 +262,8 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
         int productId = 10;
-        var updatedProduct = new UpdateProductCommand()
+        var updatedProduct = new ProductRequest()
         {
-            Id = productId,
             CategoryId = 100,
             Name = "",
             Price = -2
@@ -291,8 +281,8 @@ public class ProductControllerTest : IClassFixture<TestWebApplicationFactory<Pro
             new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
         var getAllResponse = await _client.GetAsync($"{BaseUri}/products");
 
-        var products = await getAllResponse.Content.ReadFromJsonAsync<PaginatedResponse<GetProductsResponse>>() ??
-                       new PaginatedResponse<GetProductsResponse>();
+        var products = await getAllResponse.Content.ReadFromJsonAsync<PaginatedResponse<ProductResponse>>() ??
+                       new PaginatedResponse<ProductResponse>();
 
         var productToDelete = products.Data[^1];
         

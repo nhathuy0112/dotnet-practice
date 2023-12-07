@@ -1,11 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Application.Products.Commands.AddProduct;
-using Application.Products.Commands.DeleteProduct;
-using Application.Products.Commands.UpdateProduct;
-using Application.Products.Queries.GetProductById;
-using Application.Products.Queries.GetProducts;
-using Domain.QueryParams.Product;
-using MediatR;
+using Application.Dto.Product;
+using Application.Interfaces;
+using Domain.Specification.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,52 +10,45 @@ namespace API.Controllers;
 
 public class ProductController : BaseApiController
 {
-    public ProductController(IMediator mediator) : base(mediator)
+    private readonly IProductService _productService;
+
+    public ProductController(IProductService productService)
     {
+        _productService = productService;
     }
 
+    [AllowAnonymous]
     [HttpGet("products")]
-    public async Task<IActionResult> GetProducts([FromQuery] ProductQueryParams queryParams)
+    public async Task<IActionResult> GetProducts([FromQuery] ProductRequestParams requestParams)
     {
-        return Ok(await _mediator.Send(new GetProductsQuery(queryParams)));
+        return Ok(await _productService.GetProductsAsync(requestParams));
     }
 
     [HttpGet("product/{id:int}")]
     public async Task<IActionResult> GetProductById(int id)
     {
-        return Ok(await _mediator.Send(new GetProductByIdQuery(id)));
+        return Ok(await _productService.GetProductByIdAsync(id));
     }
 
     [Authorize(Roles = "Admin")]
     [HttpPost("product")]
-    public async Task<IActionResult> AddProduct(AddProductCommand command)
+    public async Task<IActionResult> AddProduct(ProductRequest product)
     {
         string email = User.FindFirstValue(ClaimTypes.Email);
-
-        if (email != command.CreatedBy)
-        {
-            return BadRequest();
-        }
-        
-        return Ok(await _mediator.Send(command));
+        return Ok(await _productService.AddProductAsync(product, email));
     }
 
     [Authorize(Roles = "Admin")]
     [HttpPut("product/{id:int}")]
-    public async Task<IActionResult> UpdateProduct(int id, UpdateProductCommand command)
+    public async Task<IActionResult> UpdateProduct(int id, ProductRequest product)
     {
-        if (id != command.Id)
-        {
-            return BadRequest();
-        }
-        
-        return Ok(await _mediator.Send(command));
+        return Ok(await _productService.UpdateProductAsync(id, product));
     }
 
     [Authorize(Roles = "Admin")]
     [HttpDelete("product/{id:int}")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
-        return Ok(await _mediator.Send(new DeleteProductCommand(id)));
+        return Ok(await _productService.DeleteProductAsync(id));
     }
 }

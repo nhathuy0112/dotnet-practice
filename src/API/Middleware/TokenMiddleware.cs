@@ -1,5 +1,8 @@
-using Application.Common.Interfaces;
+using System.Text;
+using Application.Interfaces;
+using Domain.Entities;
 using Domain.Exceptions;
+using Domain.Specification.Token;
 
 namespace API.Middleware;
 
@@ -34,8 +37,9 @@ public class TokenMiddleware
         if (authorHeaders.Length != 0)
         {
             string token = RetrieveToken(authorHeaders);
-            var existedToken = await unitOfWork.TokenRepository.GetTokenByJwtTokenAsync(token);
-            
+            var tokenByJwtSpec = new TokenByJwtSpecification(token);
+            var existedToken = await unitOfWork.Repository<Token>().GetAsync(tokenByJwtSpec);
+        
             if (existedToken == null)
             {
                 throw new UserException("Token is not valid");

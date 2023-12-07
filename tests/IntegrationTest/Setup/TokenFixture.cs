@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Application.Users.Commands.Login;
+using Application.Dto.Auth;
 
 namespace IntegrationTest.Setup;
 
@@ -21,7 +21,7 @@ public class TokenFixture : IDisposable
     
     private void Login()
     {
-        var admin = new LoginCommand()
+        var admin = new LoginRequest()
         {
             Email = "admin@store.com",
             Password = "Abc12345!"

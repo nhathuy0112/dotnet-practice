@@ -1,3 +1,5 @@
+using Application.Interfaces;
+using Domain.Entities;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -15,84 +17,30 @@ public class UnitOfWorkTest
     }
 
     [Fact]
-    public void Test_ProductRepository()
+    public void Test_Repository()
     {
         // ARRANGE
         var unitOfWork = new UnitOfWork(_mockContext.Object);
         
         // ACT
-        var data = unitOfWork.ProductRepository;
+        var data = unitOfWork.Repository<Product>();
         
         // ASSET
-        Assert.Equal(typeof(ProductRepository), data.GetType());
+        Assert.Equal(typeof(RepositoryBase<Product>), data.GetType());
     }
-    
+
     [Fact]
-    public void Test_Same_ProductRepository()
+    public void Test_Repository_Same_Repo()
     {
         // ARRANGE
         var unitOfWork = new UnitOfWork(_mockContext.Object);
         
         // ACT
-        var firstRepo = unitOfWork.ProductRepository;
-        var secondRepo = unitOfWork.ProductRepository;
+        var firstData = unitOfWork.Repository<Product>();
+        var secondData = unitOfWork.Repository<Product>();
         
         // ASSET
-        Assert.Same(firstRepo, secondRepo);
-    }
-    
-    [Fact]
-    public void Test_CategoryRepository()
-    {
-        // ARRANGE
-        var unitOfWork = new UnitOfWork(_mockContext.Object);
-        
-        // ACT
-        var data = unitOfWork.CategoryRepository;
-        
-        // ASSET
-        Assert.Equal(typeof(CategoryRepository), data.GetType());
-    }
-    
-    [Fact]
-    public void Test_Same_CategoryRepository()
-    {
-        // ARRANGE
-        var unitOfWork = new UnitOfWork(_mockContext.Object);
-        
-        // ACT
-        var firstRepo = unitOfWork.CategoryRepository;
-        var secondRepo = unitOfWork.CategoryRepository;
-        
-        // ASSET
-        Assert.Same(firstRepo, secondRepo);
-    }
-    
-    [Fact]
-    public void Test_TokenRepository()
-    {
-        // ARRANGE
-        var unitOfWork = new UnitOfWork(_mockContext.Object);
-        
-        // ACT
-        var data = unitOfWork.TokenRepository;
-        
-        // ASSET
-        Assert.Equal(typeof(TokenRepository), data.GetType());
-    }
-    
-    [Fact]
-    public void Test_Same_TokenRepository()
-    {
-        // ARRANGE
-        var unitOfWork = new UnitOfWork(_mockContext.Object);
-        
-        // ACT
-        var firstRepo = unitOfWork.TokenRepository;
-        var secondRepo = unitOfWork.TokenRepository;
-        
-        // ASSET
-        Assert.Same(firstRepo, secondRepo);
+        Assert.Same(firstData, secondData);
     }
 
     [Fact]

@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Application.Common.Errors;
+using Application.Errors;
 using Serilog;
 
 namespace API.Middleware;

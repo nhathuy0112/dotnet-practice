@@ -1,9 +1,10 @@
 using API.Controllers;
-using Application.Users.Commands.Login;
-using Application.Users.Commands.Logout;
-using Application.Users.Commands.Refresh;
-using Application.Users.Commands.Register;
-using MediatR;
+using Application.Dto.Auth;
+using Application.Dto.User;
+using Application.Helpers;
+using Application.Interfaces;
+using Domain.Entities;
+using Domain.Specification.User;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -11,20 +12,26 @@ namespace UnitTest.Controller;
 
 public class UserTest
 {
-    private readonly Mock<IMediator> _mockMediator = new();
+    private readonly Mock<IUserService> _mockUserService;
+
+    public UserTest()
+    {
+        _mockUserService = new();
+        SetupMockUserService();
+    }
 
     [Fact]
     public async Task Test_Register()
     {
         // ARRANGE
         var once = Times.Once();
-        var controller = new UserController(_mockMediator.Object);
+        var controller = new UserController(_mockUserService.Object);
         
         // ACT
-        var data = await controller.Register(new RegisterCommand());
+        var data = await controller.Register(new RegisterRequest());
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<RegisterCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockUserService.Verify(s => s.RegisterAsync(It.IsAny<RegisterRequest>()), once);
         Assert.IsType<OkObjectResult>(data);
     }
 
@@ -33,13 +40,13 @@ public class UserTest
     {
         // ARRANGE
         var once = Times.Once();
-        var controller = new UserController(_mockMediator.Object);
+        var controller = new UserController(_mockUserService.Object);
         
         // ACT
-        var data = await controller.Login(new LoginCommand());
+        var data = await controller.Login(new LoginRequest());
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<LoginCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockUserService.Verify(s => s.LoginAsync(It.IsAny<LoginRequest>()), once);
         Assert.IsType<OkObjectResult>(data);
     }
 
@@ -48,13 +55,13 @@ public class UserTest
     {
         // ARRANGE
         var once = Times.Once();
-        var controller = new UserController(_mockMediator.Object);
+        var controller = new UserController(_mockUserService.Object);
         
         // ACT
         var data = await controller.Logout("");
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<LogoutCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockUserService.Verify(s => s.LogoutAsync(It.IsAny<string>()), once);
         Assert.IsType<OkObjectResult>(data);
     }
 
@@ -63,13 +70,34 @@ public class UserTest
     {
         // ARRANGE
         var once = Times.Once();
-        var controller = new UserController(_mockMediator.Object);
+        var controller = new UserController(_mockUserService.Object);
         
         // ACT
-        var data = await controller.Refresh(new RefreshCommand());
+        var data = await controller.Refresh(new RefreshRequest());
         
         // ASSERT
-        _mockMediator.Verify(x => x.Send(It.IsAny<RefreshCommand>(), It.IsAny<CancellationToken>()), once);
+        _mockUserService.Verify(s => s.RefreshAsync(It.IsAny<RefreshRequest>()), once);
         Assert.IsType<OkObjectResult>(data);
+    }
+
+    private void SetupMockUserService()
+    {
+        _mockUserService
+            .Setup(s => s.RegisterAsync(It.IsAny<RegisterRequest>()))
+            .ReturnsAsync(true);
+
+        _mockUserService
+            .Setup(s => s.LoginAsync(It.IsAny<LoginRequest>()))
+            .ReturnsAsync(new LoginResponse());
+
+        _mockUserService
+            .Setup(s => s.RefreshAsync(It.IsAny<RefreshRequest>()))
+            .ReturnsAsync(new RefreshResponse());
+
+        _mockUserService
+            .Setup(s => s.LogoutAsync(It.IsAny<string>()))
+            .ReturnsAsync(true);
+
+        
     }
 }

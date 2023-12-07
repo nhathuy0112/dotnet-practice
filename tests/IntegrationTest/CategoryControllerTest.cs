@@ -1,9 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Application.Categories.Commands.AddCategory;
-using Application.Categories.Commands.UpdateCategory;
-using Application.Categories.Queries.GetAllCategories;
+using Application.Dto.Category;
 using IntegrationTest.Setup;
 using Microsoft.AspNetCore.Http;
 
@@ -39,13 +37,13 @@ public class CategoryControllerTest : IClassFixture<TestWebApplicationFactory<Pr
     {
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
         string name = "Headphone";
-        var category = new AddCategoryCommand()
+        var category = new CategoryRequest()
         {
             Name = name
         };
         
         var response = await _client.PostAsJsonAsync($"{BaseUri}/category", category);
-        var newCategory = await response.Content.ReadFromJsonAsync<AddCategoryResponse>() ?? new AddCategoryResponse();
+        var newCategory = await response.Content.ReadFromJsonAsync<CategoryResponse>() ?? new CategoryResponse();
         
         Assert.NotEqual(0, newCategory.Id);
         Assert.Equal(name, newCategory.Name);
@@ -55,7 +53,7 @@ public class CategoryControllerTest : IClassFixture<TestWebApplicationFactory<Pr
     public async Task Test_AddCategory_Invalid()
     {
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
-        var category = new AddCategoryCommand()
+        var category = new CategoryRequest()
         {
             Name = ""
         };
@@ -74,14 +72,13 @@ public class CategoryControllerTest : IClassFixture<TestWebApplicationFactory<Pr
 
         var categoryToUpdate = categories[0];
 
-        var updateRequest = new UpdateCategoryCommand()
+        var updateRequest = new CategoryRequest()
         {
-            Id = categoryToUpdate.Id,
             Name = "Laptop"
         };
 
         var response = await _client.PutAsJsonAsync($"{BaseUri}/category/{categoryToUpdate.Id}", updateRequest);
-        var updatedCategory = await response.Content.ReadFromJsonAsync<UpdateCategoryCommand>() ?? new UpdateCategoryCommand();
+        var updatedCategory = await response.Content.ReadFromJsonAsync<CategoryResponse>() ?? new CategoryResponse();
 
         Assert.Equal(categoryToUpdate.Id, updatedCategory.Id);
         Assert.Equal("Laptop", updatedCategory.Name);
@@ -92,12 +89,11 @@ public class CategoryControllerTest : IClassFixture<TestWebApplicationFactory<Pr
     {
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
         string name = "";
-        int id = 1;
-        var category = new UpdateCategoryCommand()
+        var category = new CategoryRequest()
         {
-            Id = id,
             Name = name
         };
+        int id = 1;
 
         var response = await _client.PutAsJsonAsync($"{BaseUri}/category/{id}", category);
 
@@ -109,12 +105,11 @@ public class CategoryControllerTest : IClassFixture<TestWebApplicationFactory<Pr
     {
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokenFixture.AccessToken);
         string name = "Keyboard";
-        int id = 100;
-        var category = new UpdateCategoryCommand()
+        var category = new CategoryRequest()
         {
-            Id = id,
             Name = name
         };
+        int id = 0;
 
         var response = await _client.PutAsJsonAsync($"{BaseUri}/category/{id}", category);
 

@@ -1,6 +1,7 @@
-using Application.Common.Interfaces;
+using System.Linq.Expressions;
+using Application.Interfaces;
 using Domain.Entities;
-using Domain.QueryParams.User;
+using Domain.Specification;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -60,13 +61,9 @@ public class UserRepository : IUserRepository
         return _userManager.GetRolesAsync(user);
     }
 
-    public async Task<IReadOnlyList<AppUser>> GetUsersAsync(UserQueryParams queryParams, string roleId)
+    public async Task<IReadOnlyList<AppUser>> GetUsersAsync(ISpecification<AppUser> specification)
     {
-        var users = _userManager.Users.Include(u => u.UserRoles).AsQueryable();
-        users = AddFilter(users, roleId, queryParams);
-        users = AddOrderBy(users, queryParams);
-        users = AddPaging(users, queryParams);
-        return await Task.FromResult(users.ToList());
+        return await Task.FromResult(ApplySpecification(specification).AsNoTracking().ToList());
     }
 
     public async Task<IdentityRole?> GetRoleAsync(Role role)
@@ -74,11 +71,9 @@ public class UserRepository : IUserRepository
         return await Task.FromResult(_roleManager.Roles.FirstOrDefault(r => r.Name == role.ToString()));
     }
 
-    public async Task<int> CountUsersAsync(UserQueryParams queryParams, string roleId)
+    public async Task<int> CountUsersAsync(ISpecification<AppUser> specification)
     {
-        var users = _userManager.Users.Include(u => u.UserRoles).AsQueryable();
-        users = AddFilter(users, roleId, queryParams);
-        return await Task.FromResult(users.Count());
+        return await Task.FromResult(ApplySpecification(specification).Count());
     }
 
     public async Task<AppUser?> GetByIdAsync(string id)
@@ -119,36 +114,8 @@ public class UserRepository : IUserRepository
         return result.Succeeded;
     }
     
-    private IQueryable<AppUser> AddFilter(IQueryable<AppUser> users, string roleId, UserQueryParams queryParams)
+    private IQueryable<AppUser> ApplySpecification(ISpecification<AppUser> specification)
     {
-        var filter = (AppUser u) => u.UserRoles.Any(r => r.RoleId == roleId)
-                          && (string.IsNullOrEmpty(queryParams.Email) || u.Email.ToLower().Contains(queryParams.Email.ToLower()));
-        users = users.Where(filter).AsQueryable();
-        return users;
-    }
-
-    private IQueryable<AppUser> AddOrderBy(IQueryable<AppUser> users, UserQueryParams queryParams)
-    {
-        if (!string.IsNullOrEmpty(queryParams.Sort))
-        {
-            var usersOrderBy = queryParams.Sort switch
-            {
-                "email" => users.OrderBy(u => u.Email),
-                "email-desc" => users.OrderByDescending(u => u.Email),
-                _ => users.OrderBy(u => u.Id)
-            };
-            users = usersOrderBy;
-            return users;
-        }
-
-        return users;
-    }
-
-    private IQueryable<AppUser> AddPaging(IQueryable<AppUser> users, UserQueryParams queryParams)
-    {
-        users = users
-            .Skip(queryParams.PageSize * (queryParams.PageIndex - 1))
-            .Take(queryParams.PageSize);
-        return users;
+        return SpecificationEvaluator<AppUser>.GetQuery(_userManager.Users, specification);
     }
 }

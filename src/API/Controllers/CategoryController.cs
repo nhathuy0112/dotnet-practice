@@ -1,47 +1,43 @@
-using Application.Categories.Commands.AddCategory;
-using Application.Categories.Commands.DeleteCategory;
-using Application.Categories.Commands.UpdateCategory;
-using Application.Categories.Queries.GetAllCategories;
-using MediatR;
+using Application.Dto.Category;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[Authorize(Roles = "Admin")]
 public class CategoryController : BaseApiController
 {
-    public CategoryController(IMediator mediator) : base(mediator)
+    private readonly ICategoryService _categoryService;
+
+    public CategoryController(ICategoryService categoryService)
     {
+        _categoryService = categoryService;
     }
 
-    [AllowAnonymous]
     [HttpGet("categories")]
     public async Task<IActionResult> GetCategories()
     {
-        return Ok(await _mediator.Send(new GetAllCategoriesQuery()));
+        return Ok(await _categoryService.GetCategoriesAsync());
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("category")]
-    public async Task<IActionResult> AddCategory(AddCategoryCommand command)
+    public async Task<IActionResult> AddCategory(CategoryRequest category)
     {
-        return Ok(await _mediator.Send(command));
+        return Ok(await _categoryService.AddCategoryAsync(category));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("category/{id:int}")]
-    public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryCommand command)
+    public async Task<IActionResult> UpdateCategory(int id, CategoryRequest category)
     {
-        if (id != command.Id)
-        {
-            return BadRequest();
-        }
-        
-        return Ok(await _mediator.Send(command));
+        return Ok(await _categoryService.UpdateCategoryAsync(id, category));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("category/{id:int}")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
-        return Ok(await _mediator.Send(new DeleteCategoryCommand(id)));
+        return Ok(await _categoryService.DeleteCategoryAsync(id));
     }
 }
