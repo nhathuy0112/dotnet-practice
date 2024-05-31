@@ -22,11 +22,12 @@ public class ExceptionMiddleware
         }
         catch (Exception e)
         {
-            Log.Error("{@Exception}", e);
+            Log.Error("{ExceptionMiddleware}: {@Exception}", nameof(ExceptionMiddleware), e);
+            
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
 
-            var response = new ExceptionResponse((int)HttpStatusCode.InternalServerError, e.Message);
+            var response = new ExceptionResponse((int) HttpStatusCode.InternalServerError, "Internal error");
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var json = JsonSerializer.Serialize(response, options);

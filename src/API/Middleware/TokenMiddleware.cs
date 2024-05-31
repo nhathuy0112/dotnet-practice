@@ -1,5 +1,6 @@
 using Application.Common.Interfaces;
 using Domain.Exceptions;
+using Serilog;
 
 namespace API.Middleware;
 
@@ -10,21 +11,6 @@ public class TokenMiddleware
     public TokenMiddleware(RequestDelegate next)
     {
         _next = next;
-    }
-
-    private string RetrieveToken(string[] authorHeaders)
-    {
-        foreach (string authorHeader in authorHeaders)
-        {
-            if (!authorHeader.StartsWith("Bearer"))
-            {
-                continue;
-            }
-            
-            return authorHeader.Replace("Bearer ", "");
-        }
-
-        throw new UserException("Token is not valid");
     }
 
     public async Task InvokeAsync(HttpContext context, IUnitOfWork unitOfWork)
@@ -38,10 +24,25 @@ public class TokenMiddleware
             
             if (existedToken == null)
             {
-                throw new UserException("Token is not valid");
+                throw new UserException($"{nameof(TokenMiddleware)}->{nameof(InvokeAsync)}: Token is not valid");
             }
         }
 
         await _next(context);
+    }
+    
+    private string RetrieveToken(string[] authorHeaders)
+    {
+        foreach (string authorHeader in authorHeaders)
+        {
+            if (!authorHeader.StartsWith("Bearer"))
+            {
+                continue;
+            }
+            
+            return authorHeader.Replace("Bearer ", "");
+        }
+
+        throw new UserException($"{nameof(TokenMiddleware)}->{nameof(RetrieveToken)}: Header does not contains token");
     }
 }

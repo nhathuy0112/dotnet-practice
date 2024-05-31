@@ -13,8 +13,9 @@ public class LoggingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        Log.Information("{@Time} - Request from {@RequestPath}", DateTime.Now, context.Request.Path.Value);
+        string dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        Log.Information("{Time} - Request from {RequestPath}", DateTime.Now.ToString(dateTimeFormat), context.Request.Path.Value);
         await _next(context);
-        Log.Information("{@Time} - Response code {@Code}", DateTime.Now, context.Response.StatusCode);
+        Log.Information("{Time} - Response code {Code}", DateTime.Now.ToString(dateTimeFormat), context.Response.StatusCode);
     }
 }
