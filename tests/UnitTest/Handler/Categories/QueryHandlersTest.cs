@@ -29,7 +29,7 @@ public class QueryHandlersTest
         await handler.Handle(new GetAllCategoriesQuery(), new CancellationToken());
         
         // ARRANGE
-        _mockRepo.Verify(x => x.GetAllCategoriesAsync(), once);
+        _mockRepo.Verify(x => x.GetAllAsync(), once);
         _mockMapper.Verify(x => x.Map<IReadOnlyList<Category>, IReadOnlyList<CategoryResponse>>(It.IsAny<IReadOnlyList<Category>>()), once);
     }
 

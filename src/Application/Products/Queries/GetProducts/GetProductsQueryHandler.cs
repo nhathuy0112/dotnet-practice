@@ -20,8 +20,8 @@ public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, Paginat
 
     public async Task<PaginatedResponse<GetProductsResponse>> Handle(GetProductsQuery query, CancellationToken cancellationToken)
     {
-        var products = await _unitOfWork.ProductRepository.GetProductsAsync(query.QueryParams);
-        var count = await _unitOfWork.ProductRepository.CountProductsAsync(query.QueryParams);
+        var products = await _unitOfWork.ProductRepository.GetAsync(query.QueryParams);
+        var count = await _unitOfWork.ProductRepository.CountAsync(query.QueryParams);
         var data = _mapper.Map<IReadOnlyList<Product>, IReadOnlyList<GetProductsResponse>>(products);
         return new PaginatedResponse<GetProductsResponse>()
         {

@@ -32,7 +32,7 @@ public class CommandHandlersTest
         await handler.Handle(new AddCategoryCommand(), new CancellationToken());
         
         // ASSERT
-        _mockRepo.Verify(x => x.AddCategoryAsync(It.IsAny<Category>()), once);
+        _mockRepo.Verify(x => x.AddAsync(It.IsAny<Category>()), once);
         _mockUnitOfWork.Verify(x => x.CompleteAsync(), once);
         _mockMapper.Verify(x => x.Map<AddCategoryResponse>(It.IsAny<Category>()), once);
     }
@@ -44,7 +44,7 @@ public class CommandHandlersTest
         var once = Times.Once();
 
         _mockRepo
-            .Setup(x => x.GetCategoryByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
+            .Setup(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
             .ReturnsAsync(new Category());
         
         var handler = new UpdateCategoryCommandHandler(_mockUnitOfWork.Object, _mockMapper.Object);
@@ -53,8 +53,8 @@ public class CommandHandlersTest
         await handler.Handle(new UpdateCategoryCommand() {Id = 1}, new CancellationToken());
         
         // ASSERT
-        _mockRepo.Verify(x => x.GetCategoryByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
-        _mockRepo.Verify(x => x.UpdateCategoryAsync(It.IsAny<Category>()), once);
+        _mockRepo.Verify(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
+        _mockRepo.Verify(x => x.Update(It.IsAny<Category>()), once);
         _mockUnitOfWork.Verify(x => x.CompleteAsync(), once);
         _mockMapper.Verify(x => x.Map<UpdateCategoryResponse>(It.IsAny<Category>()), once);
     }
@@ -79,7 +79,7 @@ public class CommandHandlersTest
         var once = Times.Once();
 
         _mockRepo
-            .Setup(x => x.GetCategoryByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
+            .Setup(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
             .ReturnsAsync(new Category());
         
         var handler = new DeleteCategoryCommandHandler(_mockUnitOfWork.Object);
@@ -88,8 +88,8 @@ public class CommandHandlersTest
         await handler.Handle(new DeleteCategoryCommand(1), new CancellationToken());
         
         // ASSERT
-        _mockRepo.Verify(x => x.GetCategoryByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
-        _mockRepo.Verify(x => x.DeleteCategoryAsync(It.IsAny<Category>()), once);
+        _mockRepo.Verify(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
+        _mockRepo.Verify(x => x.Delete(It.IsAny<Category>()), once);
         _mockUnitOfWork.Verify(x => x.CompleteAsync(), once);
     }
     

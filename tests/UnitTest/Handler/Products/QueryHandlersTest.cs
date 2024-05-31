@@ -32,7 +32,7 @@ public class QueryHandlersTest
         await handler.Handle(new GetProductsQuery(new ProductQueryParams()), new CancellationToken());
         
         // ASSERT
-        _mockRepo.Verify(x => x.GetProductsAsync(It.IsAny<ProductQueryParams>()), once);
+        _mockRepo.Verify(x => x.GetAsync(It.IsAny<ProductQueryParams>()), once);
         _mockMapper.Verify(x => x.Map<IReadOnlyList<Product>, IReadOnlyList<GetProductsResponse>>(It.IsAny<IReadOnlyList<Product>>()), once);
     }
 
@@ -43,7 +43,7 @@ public class QueryHandlersTest
         var once = Times.Once();
 
         _mockRepo
-            .Setup(x => x.GetProductByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
+            .Setup(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
             .ReturnsAsync(new Product());
         
         var handler = new GetProductByIdQueryHandler(_mockUnitOfWork.Object, _mockMapper.Object);
@@ -52,7 +52,7 @@ public class QueryHandlersTest
         await handler.Handle(new GetProductByIdQuery(1), new CancellationToken());
         
         // ASSERT
-        _mockRepo.Verify(x => x.GetProductByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
+        _mockRepo.Verify(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
         _mockMapper.Verify(x => x.Map<GetProductByIdResponse>(It.IsAny<Product>()));
     }
     

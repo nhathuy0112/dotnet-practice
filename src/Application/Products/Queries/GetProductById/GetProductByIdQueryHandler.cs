@@ -18,7 +18,7 @@ public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, G
 
     public async Task<GetProductByIdResponse> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
     {
-        var product = await _unitOfWork.ProductRepository.GetProductByIdAsync(query.Id);
+        var product = await _unitOfWork.ProductRepository.GetByIdAsync(query.Id);
 
         if (product == null)
         {

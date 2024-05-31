@@ -28,7 +28,7 @@ public class ProductRepositoryTest
         var productRepo = new ProductRepository(_mockContext.Object);
         
         // ACT
-        var data = await productRepo.GetProductsAsync(queryParams);
+        var data = await productRepo.GetAsync(queryParams);
         
         // ASSET
         Assert.NotEmpty(data);
@@ -43,7 +43,7 @@ public class ProductRepositoryTest
         var productRepo = new ProductRepository(_mockContext.Object);
         
         // ACT
-        var data = await productRepo.CountProductsAsync(queryParams);
+        var data = await productRepo.CountAsync(queryParams);
         
         // ASSERT
         Assert.NotEqual(0, data);
@@ -58,7 +58,7 @@ public class ProductRepositoryTest
         var productRepo = new ProductRepository(_mockContext.Object);
 
         // ACT
-        var data = await productRepo.GetProductByIdAsync(id);
+        var data = await productRepo.GetByIdAsync(id);
 
         // ASSET
         Assert.NotNull(data);
@@ -77,14 +77,14 @@ public class ProductRepositoryTest
         var productRepo = new ProductRepository(_mockContext.Object);
 
         // ACT
-        await productRepo.AddProductAsync(newProduct);
+        await productRepo.AddAsync(newProduct);
         
         // ASSERT
         Assert.Equal(3, _data[^1].Id);
     }
     
     [Fact]
-    public async Task Test_DeleteProductAsync()
+    public void Test_DeleteProductAsync()
     {
         // ARRANGE
         int countBeforeRemove = _data.Count;
@@ -93,7 +93,7 @@ public class ProductRepositoryTest
         var productRepo = new ProductRepository(_mockContext.Object);
 
         // ACT
-        await productRepo.DeleteProductAsync(productToRemove);
+        productRepo.Delete(productToRemove);
         
         // ASSERT
         Assert.NotEqual(countBeforeRemove, _data.Count);

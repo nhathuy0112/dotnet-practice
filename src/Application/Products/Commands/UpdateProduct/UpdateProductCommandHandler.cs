@@ -18,7 +18,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
 
     public async Task<UpdateProductResponse> Handle(UpdateProductCommand command, CancellationToken cancellationToken)
     {
-        var category = await _unitOfWork.CategoryRepository.GetCategoryByIdAsync(command.CategoryId);
+        var category = await _unitOfWork.CategoryRepository.GetByIdAsync(command.CategoryId);
 
          if (category == null)
          {
@@ -26,7 +26,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
          }
 
          var productRepo = _unitOfWork.ProductRepository;
-         var existedProduct = await productRepo.GetProductByIdAsync(command.Id);
+         var existedProduct = await productRepo.GetByIdAsync(command.Id);
          
          if (existedProduct == null)
          {
@@ -36,7 +36,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
          existedProduct.Name = command.Name;
          existedProduct.CategoryId = command.CategoryId;
          existedProduct.Price = command.Price;
-         await productRepo.UpdateProductAsync(existedProduct);
+         productRepo.Update(existedProduct);
          await _unitOfWork.CompleteAsync();
          return _mapper.Map<UpdateProductResponse>(existedProduct);
     }

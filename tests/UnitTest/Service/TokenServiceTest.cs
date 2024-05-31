@@ -100,7 +100,7 @@ public class TokenServiceTest
         await tokenService.SaveTokenAsync(new Token());
         
         // ASSERT
-        _mockTokenRepo.Verify(x => x.AddTokenAsync(It.IsAny<Token>()), onceTime);
+        _mockTokenRepo.Verify(x => x.AddAsync(It.IsAny<Token>()), onceTime);
         _mockUnitOfWork.Verify(x => x.CompleteAsync(), onceTime);
     }
 
@@ -181,7 +181,7 @@ public class TokenServiceTest
         await tokenService.UpdateTokenAsync(new Token());
 
         // ASSERT
-        _mockTokenRepo.Verify(x => x.UpdateTokenAsync(It.IsAny<Token>()), onceTime);
+        _mockTokenRepo.Verify(x => x.Update(It.IsAny<Token>()), onceTime);
         _mockUnitOfWork.Verify(x => x.CompleteAsync(), onceTime);
     }
     
@@ -197,7 +197,7 @@ public class TokenServiceTest
         await tokenService.DeleteTokenAsync(new Token());
 
         // ASSERT
-        _mockTokenRepo.Verify(x => x.DeleteTokenAsync(It.IsAny<Token>()), onceTime);
+        _mockTokenRepo.Verify(x => x.Delete(It.IsAny<Token>()), onceTime);
         _mockUnitOfWork.Verify(x => x.CompleteAsync(), onceTime);
     }
 

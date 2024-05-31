@@ -73,14 +73,14 @@ public class TokenRepositoryTest
         var tokenRepo = new TokenRepository(_mockContext.Object);
 
         // ACT
-        await tokenRepo.AddTokenAsync(newToken);
+        await tokenRepo.AddAsync(newToken);
         
         // ASSERT
         Assert.Equal(newToken.Id, _data[^1].Id);
     }
 
     [Fact]
-    public async Task Test_DeleteTokenAsync()
+    public void Test_DeleteTokenAsync()
     {
         // ARRANGE
         var countBeforeDelete = _data.Count;
@@ -88,7 +88,7 @@ public class TokenRepositoryTest
         var tokenRepo = new TokenRepository(_mockContext.Object);
 
         // ACT
-        await tokenRepo.DeleteTokenAsync(tokenToDelete);
+        tokenRepo.Delete(tokenToDelete);
         
         // ASSERT
         Assert.NotEqual(countBeforeDelete, _data.Count);

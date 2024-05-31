@@ -22,7 +22,7 @@ public class AddCategoryCommandHandler : IRequestHandler<AddCategoryCommand, Add
         {
             Name = command.Name
         };
-        await _unitOfWork.CategoryRepository.AddCategoryAsync(newCategory);
+        await _unitOfWork.CategoryRepository.AddAsync(newCategory);
         await _unitOfWork.CompleteAsync();
         return _mapper.Map<AddCategoryResponse>(newCategory);
     }

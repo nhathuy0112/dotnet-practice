@@ -13,12 +13,6 @@ public class TokenRepository : RepositoryBase<Token>, ITokenRepository
         _context = context;
     }
 
-    public Task AddTokenAsync(Token token)
-    {
-        Add(token);
-        return Task.CompletedTask;
-    }
-
     public async Task<Token?> GetTokenIncludeUserAsync(string accessToken, string refreshToken)
     {
         return await _context.Tokens
@@ -34,17 +28,5 @@ public class TokenRepository : RepositoryBase<Token>, ITokenRepository
     public async Task<Token?> GetTokenByJwtTokenAsync(string jwtToken)
     {
         return await Task.FromResult(_context.Tokens.FirstOrDefault(t => t.JwtToken == jwtToken));
-    }
-
-    public Task UpdateTokenAsync(Token token)
-    {
-        Update(token);
-        return Task.CompletedTask;
-    }
-
-    public Task DeleteTokenAsync(Token token)
-    {
-        Delete(token);
-        return Task.CompletedTask;
     }
 }

@@ -29,7 +29,7 @@ public class CommandHandlersTest
         var once = Times.Once();
 
         _mockCategoryRepo
-            .Setup(x => x.GetCategoryByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
+            .Setup(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
             .ReturnsAsync(new Category());
 
         var handler = new AddProductCommandHandler(_mockUnitOfWork.Object, _mockMapper.Object);
@@ -38,7 +38,7 @@ public class CommandHandlersTest
         await handler.Handle(new AddProductCommand() {CategoryId = 1}, new CancellationToken());
         
         // ASSERT
-        _mockRepo.Verify(x => x.AddProductAsync(It.IsAny<Product>()), once);
+        _mockRepo.Verify(x => x.AddAsync(It.IsAny<Product>()), once);
         _mockUnitOfWork.Verify(x => x.CompleteAsync(), once);
     }
     
@@ -62,11 +62,11 @@ public class CommandHandlersTest
         var once = Times.Once();
         
         _mockCategoryRepo
-            .Setup(x => x.GetCategoryByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
+            .Setup(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
             .ReturnsAsync(new Category());
 
         _mockRepo
-            .Setup(x => x.GetProductByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
+            .Setup(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
             .ReturnsAsync(new Product());
         
         var handler = new UpdateProductCommandHandler(_mockUnitOfWork.Object, _mockMapper.Object);
@@ -75,9 +75,9 @@ public class CommandHandlersTest
         await handler.Handle(new UpdateProductCommand() { Id = 1, CategoryId = 1 }, new CancellationToken());
         
         // ASSERT
-        _mockCategoryRepo.Verify(x => x.GetCategoryByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
-        _mockRepo.Verify(x => x.GetProductByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
-        _mockRepo.Verify(x => x.UpdateProductAsync(It.IsAny<Product>()));
+        _mockCategoryRepo.Verify(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
+        _mockRepo.Verify(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
+        _mockRepo.Verify(x => x.Update(It.IsAny<Product>()));
         _mockUnitOfWork.Verify(x => x.CompleteAsync());
         _mockMapper.Verify(x => x.Map<UpdateProductResponse>(It.IsAny<Product>()));
     }
@@ -100,7 +100,7 @@ public class CommandHandlersTest
     {
         // ARRANGE
         _mockCategoryRepo
-            .Setup(x => x.GetCategoryByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
+            .Setup(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
             .ReturnsAsync(new Category());
         
         var handler = new UpdateProductCommandHandler(_mockUnitOfWork.Object, _mockMapper.Object);
@@ -118,7 +118,7 @@ public class CommandHandlersTest
         // ARRANGE
         var once = Times.Once();
         _mockRepo
-            .Setup(x => x.GetProductByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
+            .Setup(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)))
             .ReturnsAsync(new Product());
 
         var handler = new DeleteProductCommandHandler(_mockUnitOfWork.Object);
@@ -127,8 +127,8 @@ public class CommandHandlersTest
         await handler.Handle(new DeleteProductCommand(1), new CancellationToken());
         
         // ASSERT
-        _mockRepo.Verify(x => x.GetProductByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
-        _mockRepo.Verify(x => x.DeleteProductAsync(It.IsAny<Product>()), once);
+        _mockRepo.Verify(x => x.GetByIdAsync(It.IsInRange(1, Int32.MaxValue, Range.Inclusive)), once);
+        _mockRepo.Verify(x => x.Delete(It.IsAny<Product>()), once);
         _mockUnitOfWork.Verify(x => x.CompleteAsync(), once);
     }
     

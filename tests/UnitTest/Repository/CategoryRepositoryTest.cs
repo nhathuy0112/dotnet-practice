@@ -25,7 +25,7 @@ public class CategoryRepositoryTest
         var categoryRepo = new CategoryRepository(_mockContext.Object);
         
         // ACT
-        var data = await categoryRepo.GetAllCategoriesAsync();
+        var data = await categoryRepo.GetAllAsync();
         
         // ASSERT
         Assert.Equal(_data.Count, data.Count);
@@ -39,7 +39,7 @@ public class CategoryRepositoryTest
         int id = 1;
         
         // ACT
-        var data = await categoryRepo.GetCategoryByIdAsync(id);
+        var data = await categoryRepo.GetByIdAsync(id);
         
         // ASSERT
         Assert.NotNull(data);
@@ -56,14 +56,14 @@ public class CategoryRepositoryTest
         var categoryRepo = new CategoryRepository(_mockContext.Object);
         
         // ACT
-        await categoryRepo.AddCategoryAsync(newCategory);
+        await categoryRepo.AddAsync(newCategory);
         
         // ASSERT
         Assert.Equal(newCategory.Id, _data[^1].Id);
     }
 
     [Fact]
-    public async Task Test_DeleteCategoryAsync()
+    public void Test_DeleteCategoryAsync()
     {
         // ARRANGE
         var countBeforeDelete = _data.Count;
@@ -71,7 +71,7 @@ public class CategoryRepositoryTest
         var categoryRepo = new CategoryRepository(_mockContext.Object);
 
         // ACT
-        await categoryRepo.DeleteCategoryAsync(categoryToRemove);
+        categoryRepo.Delete(categoryToRemove);
         
         // ASSERT
         Assert.NotEqual(countBeforeDelete, _data.Count);

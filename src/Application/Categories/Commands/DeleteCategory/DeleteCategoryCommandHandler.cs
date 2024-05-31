@@ -16,14 +16,14 @@ public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryComman
     public async Task<bool> Handle(DeleteCategoryCommand command, CancellationToken cancellationToken)
     {
         var categoryRepo = _unitOfWork.CategoryRepository;
-        var existedCategory = await categoryRepo.GetCategoryByIdAsync(command.Id);
+        var existedCategory = await categoryRepo.GetByIdAsync(command.Id);
 
          if (existedCategory == null)
          {
              throw new CategoryException("Cannot find category");
          }
 
-         await categoryRepo.DeleteCategoryAsync(existedCategory);
+         categoryRepo.Delete(existedCategory);
          await _unitOfWork.CompleteAsync();
          return true;
     }

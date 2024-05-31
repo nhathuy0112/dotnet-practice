@@ -19,7 +19,7 @@ public class AddProductCommandHandler : IRequestHandler<AddProductCommand, AddPr
 
     public async Task<AddProductResponse> Handle(AddProductCommand command, CancellationToken cancellationToken)
     {
-        var category = await _unitOfWork.CategoryRepository.GetCategoryByIdAsync(command.CategoryId);
+        var category = await _unitOfWork.CategoryRepository.GetByIdAsync(command.CategoryId);
         
         if (category == null)
         {
@@ -34,7 +34,7 @@ public class AddProductCommandHandler : IRequestHandler<AddProductCommand, AddPr
             Name = command.Name,
             Price = command.Price
         };
-        await _unitOfWork.ProductRepository.AddProductAsync(newProduct);
+        await _unitOfWork.ProductRepository.AddAsync(newProduct);
         await _unitOfWork.CompleteAsync();
         return _mapper.Map<AddProductResponse>(newProduct);
     }

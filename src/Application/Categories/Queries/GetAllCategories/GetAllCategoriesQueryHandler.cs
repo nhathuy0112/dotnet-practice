@@ -18,7 +18,7 @@ public class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategoriesQuer
 
     public async Task<IReadOnlyList<CategoryResponse>> Handle(GetAllCategoriesQuery query, CancellationToken cancellationToken)
     {
-        var categories = await _unitOfWork.CategoryRepository.GetAllCategoriesAsync();
+        var categories = await _unitOfWork.CategoryRepository.GetAllAsync();
         return _mapper.Map<IReadOnlyList<Category>, IReadOnlyList<CategoryResponse>>(categories);
     }
 }

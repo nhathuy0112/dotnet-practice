@@ -14,10 +14,8 @@ public class TokenService : ITokenService
     private readonly IUserRepository _userRepository;
     private readonly IConfiguration _configuration;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly DateTime _now;
     public TokenService(IUserRepository userRepository, IConfiguration configuration, IUnitOfWork unitOfWork)
     {
-        _now = DateTime.Now.ToUniversalTime();
         _userRepository = userRepository;
         _configuration = configuration;
         _unitOfWork = unitOfWork;
@@ -93,7 +91,7 @@ public class TokenService : ITokenService
 
     public async Task SaveTokenAsync(Token tokenEntity)
     {
-        await _unitOfWork.TokenRepository.AddTokenAsync(tokenEntity);
+        await _unitOfWork.TokenRepository.AddAsync(tokenEntity);
         await _unitOfWork.CompleteAsync();
     }
 
@@ -191,13 +189,13 @@ public class TokenService : ITokenService
 
     public async Task UpdateTokenAsync(Token tokenEntity)
     {
-        await _unitOfWork.TokenRepository.UpdateTokenAsync(tokenEntity);
+        _unitOfWork.TokenRepository.Update(tokenEntity);
         await _unitOfWork.CompleteAsync();
     }
 
     public async Task DeleteTokenAsync(Token tokenEntity)
     {
-        await _unitOfWork.TokenRepository.DeleteTokenAsync(tokenEntity);
+        _unitOfWork.TokenRepository.Delete(tokenEntity);
         await _unitOfWork.CompleteAsync();
     }
 }

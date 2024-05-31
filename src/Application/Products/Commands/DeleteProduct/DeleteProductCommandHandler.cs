@@ -16,14 +16,14 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand,
     public async Task<bool> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
     {
         var productRepo = _unitOfWork.ProductRepository;
-         var existedProduct = await productRepo.GetProductByIdAsync(command.Id);
+         var existedProduct = await productRepo.GetByIdAsync(command.Id);
          
          if (existedProduct == null)
          {
              throw new ProductException("Cannot find product");
          }
          
-         await productRepo.DeleteProductAsync(existedProduct);
+         productRepo.Delete(existedProduct);
          await _unitOfWork.CompleteAsync();
          return true;
     }

@@ -19,7 +19,7 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
     public async Task<UpdateCategoryResponse> Handle(UpdateCategoryCommand command, CancellationToken cancellationToken)
     {
         var categoryRepo = _unitOfWork.CategoryRepository;
-        var existedCategory = await categoryRepo.GetCategoryByIdAsync(command.Id);
+        var existedCategory = await categoryRepo.GetByIdAsync(command.Id);
 
          if (existedCategory == null)
          {
@@ -27,7 +27,7 @@ public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryComman
          }
 
          existedCategory.Name = command.Name;
-         await categoryRepo.UpdateCategoryAsync(existedCategory);
+         categoryRepo.Update(existedCategory);
          await _unitOfWork.CompleteAsync();
          return _mapper.Map<UpdateCategoryResponse>(existedCategory);
     }
