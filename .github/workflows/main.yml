@@ -1,0 +1,16 @@
+name: Hello_World_pipeline
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run a one-line script
+        run: echo Hello World! This is a simple pipeline
+      - name: Run a multi-line script
+        run: 
+          echo This is a multi-line script step
+          echo This is the 2nd line of multi-line script step
