@@ -11,9 +11,9 @@ jobs:
         - name: Env Dev - Job Build - Step 1
           env:
             ENV_NAME: ${{secrets.Environment}}
-          run: 
+          run: |
             echo "Retrieving Environment name from secrets..."
-            echo $ENV_NAME
+            if [ $ENV_NAME = "Development" ]; then echo "Env: Dev"; fi
           
       
   
